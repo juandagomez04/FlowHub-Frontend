@@ -1,0 +1,93 @@
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(180deg, #f8fbff 0%, #eaf4ff 100%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 30rem;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(74, 119, 150, 0.14);
+  border-radius: 2rem;
+  padding: 2rem;
+  box-shadow: 0 24px 60px rgba(74, 119, 150, 0.08);
+}
+
+.auth-title {
+  margin: 0 0 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #102b44;
+  text-align: center;
+}
+
+.auth-page-title {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #102b44;
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-input {
+  width: 100%;
+}
+
+.auth-input input {
+  background: #ffffff;
+  border: 1px solid #c9dff0;
+  color: #1f3a4d;
+}
+
+.auth-input input:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(79, 148, 209, 0.18);
+}
+
+.auth-button-primary {
+  background: #4f94d1;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 10px 25px rgba(79, 148, 209, 0.18);
+}
+
+.auth-button-primary:hover {
+  background: #497fbf;
+}
+
+.auth-button-secondary {
+  background: transparent;
+  color: #1f3a4d;
+  border: none;
+}
+
+.auth-button-secondary:hover {
+  background: rgba(79, 148, 209, 0.08);
+}
+
+.auth-note {
+  margin: 0;
+  color: #4a657c;
+  font-size: 0.85rem;
+}
+
+.auth-divider {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(90, 130, 170, 0.18);
+}
+
+.auth-error {
+  color: #d04445;
+  font-size: 0.9rem;
+}

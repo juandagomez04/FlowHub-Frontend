@@ -1,0 +1,92 @@
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  background: linear-gradient(180deg, #f2f6fb 0%, #e7eef7 100%);
+}
+
+.app-aside {
+  width: 18rem;
+  background: #e1e8ef;
+  border-right: 1px solid rgba(118, 145, 167, 0.18);
+  color: #102b44;
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+  gap: 1rem;
+  box-shadow: inset -1px 0 0 rgba(118, 145, 167, 0.08);
+}
+
+.app-brand {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #102b44;
+}
+
+.app-nav-link {
+  display: block;
+  color: #3d5b72;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.app-nav-link:hover {
+  background: rgba(79, 148, 209, 0.12);
+  color: #102b44;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-topbar {
+  height: 4rem;
+  background: #f0f4f8;
+  border-bottom: 1px solid rgba(118, 145, 167, 0.18);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  color: #4a657c;
+}
+
+.app-content {
+  flex: 1;
+  padding: 2rem;
+}
+
+.dashboard-hero {
+  background: #f7fbff;
+  border: 1px solid rgba(118, 145, 167, 0.16);
+  border-radius: 1.75rem;
+  box-shadow: 0 24px 60px rgba(118, 145, 167, 0.06);
+  padding: 2rem;
+  color: #102b44;
+}
+
+.dashboard-hero h1 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(2rem, 2.4vw, 2.75rem);
+  line-height: 1.05;
+}
+
+.dashboard-hero p {
+  margin: 0;
+  color: #4a657c;
+  line-height: 1.8;
+}
+
+@media (max-width: 900px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .app-aside {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(118, 145, 167, 0.18);
+  }
+}
