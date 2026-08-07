@@ -1,70 +1,143 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import Button from './Button'
 import Input from './Input'
+import Spinner from './Spinner'
+import { EyeIcon, EyeOffIcon, AlertIcon } from './icons/AuthIcons'
+
+const registerSchema = z
+  .object({
+    name: z.string().min(2, 'Ingresá tu nombre completo.'),
+    email: z.string().min(1, 'Ingresá tu correo electrónico.').email('Ingresá un correo electrónico válido.'),
+    password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
+    confirmPassword: z.string().min(1, 'Confirmá tu contraseña.'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Las contraseñas no coinciden.',
+    path: ['confirmPassword'],
+  })
 
 export default function RegisterForm() {
   const navigate = useNavigate()
   const login = useAuthStore((state) => state.login)
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    if (!name || !email || !password || !confirmPassword) {
-      setError('Todos los campos son obligatorios.')
-      return
-    }
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.')
-      return
-    }
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+  })
 
-    login({ name, email }, 'demo-token')
-    navigate('/dashboard')
+  const onSubmit = async ({ name, email }) => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      login({ name, email }, 'demo-token')
+      navigate('/dashboard')
+    } catch {
+      setError('root', { message: 'No pudimos crear tu cuenta. Intentá nuevamente.' })
+    }
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
-      <h2 className="auth-page-title">Crear cuenta</h2>
+    <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <div className="auth-heading">
+        <h2 className="auth-page-title">Crear cuenta</h2>
+        <p className="auth-page-subtitle">Completá tus datos para empezar a usar FlowHub.</p>
+      </div>
+
       <Input
         label="Nombre completo"
         type="text"
+        autoComplete="name"
         placeholder="Tu nombre"
-        value={name}
-        onChange={(event) => setName(event.target.value)}
+        error={errors.name?.message}
+        disabled={isSubmitting}
+        required
+        {...register('name')}
       />
       <Input
         label="Correo electrónico"
         type="email"
+        autoComplete="email"
         placeholder="tucorreo@ejemplo.com"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
+        error={errors.email?.message}
+        disabled={isSubmitting}
+        required
+        {...register('email')}
       />
       <Input
         label="Contraseña"
-        type="password"
+        type={showPassword ? 'text' : 'password'}
+        autoComplete="new-password"
         placeholder="********"
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
+        error={errors.password?.message}
+        disabled={isSubmitting}
+        required
+        endAdornment={
+          <button
+            type="button"
+            className="auth-input-toggle"
+            onClick={() => setShowPassword((value) => !value)}
+            aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            aria-pressed={showPassword}
+          >
+            {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+          </button>
+        }
+        {...register('password')}
       />
       <Input
         label="Confirmar contraseña"
-        type="password"
+        type={showConfirmPassword ? 'text' : 'password'}
+        autoComplete="new-password"
         placeholder="********"
-        value={confirmPassword}
-        onChange={(event) => setConfirmPassword(event.target.value)}
+        error={errors.confirmPassword?.message}
+        disabled={isSubmitting}
+        required
+        endAdornment={
+          <button
+            type="button"
+            className="auth-input-toggle"
+            onClick={() => setShowConfirmPassword((value) => !value)}
+            aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            aria-pressed={showConfirmPassword}
+          >
+            {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+          </button>
+        }
+        {...register('confirmPassword')}
       />
 
-      {error && <p className="auth-error">{error}</p>}
+      {errors.root && (
+        <p className="auth-alert" role="alert">
+          <AlertIcon />
+          <span>{errors.root.message}</span>
+        </p>
+      )}
 
-      <Button type="submit" className="auth-button-primary">
-        Crear cuenta
+      <Button type="submit" className="auth-button-primary w-full" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <span className="auth-button-loading">
+            <Spinner size="sm" tone="onPrimary" />
+            Creando cuenta…
+          </span>
+        ) : (
+          'Crear cuenta'
+        )}
       </Button>
+
+      <p className="auth-switch">
+        ¿Ya tenés cuenta? <Link to="/login">Iniciá sesión</Link>
+      </p>
     </form>
   )
 }

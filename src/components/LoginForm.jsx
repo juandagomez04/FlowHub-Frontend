@@ -1,25 +1,42 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import Button from './Button'
 import Input from './Input'
+import Spinner from './Spinner'
+import { EyeIcon, EyeOffIcon, AlertIcon } from './icons/AuthIcons'
+
+const loginSchema = z.object({
+  email: z.string().min(1, 'Ingresá tu correo electrónico.').email('Ingresá un correo electrónico válido.'),
+  password: z.string().min(1, 'Ingresá tu contraseña.'),
+})
 
 export default function LoginForm() {
   const navigate = useNavigate()
   const login = useAuthStore((state) => state.login)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    if (!email || !password) {
-      setError('Por favor completa email y contraseña.')
-      return
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  })
+
+  const onSubmit = async ({ email }) => {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      login({ name: email.split('@')[0], email }, 'demo-token')
+      navigate('/dashboard')
+    } catch {
+      setError('root', { message: 'No pudimos iniciar sesión. Intentá nuevamente.' })
     }
-
-    login({ name: email.split('@')[0], email }, 'demo-token')
-    navigate('/dashboard')
   }
 
   const handleDevPreview = () => {
@@ -28,32 +45,74 @@ export default function LoginForm() {
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
-      <h2 className="auth-page-title">Iniciar sesión</h2>
+    <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <div className="auth-heading">
+        <h2 className="auth-page-title">Iniciar sesión</h2>
+        <p className="auth-page-subtitle">Ingresá tus credenciales para acceder a tu cuenta.</p>
+      </div>
+
       <Input
         label="Correo electrónico"
         type="email"
+        autoComplete="email"
         placeholder="tucorreo@ejemplo.com"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
+        error={errors.email?.message}
+        disabled={isSubmitting}
+        required
+        {...register('email')}
       />
       <Input
         label="Contraseña"
-        type="password"
+        type={showPassword ? 'text' : 'password'}
+        autoComplete="current-password"
         placeholder="********"
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
+        error={errors.password?.message}
+        disabled={isSubmitting}
+        required
+        endAdornment={
+          <button
+            type="button"
+            className="auth-input-toggle"
+            onClick={() => setShowPassword((value) => !value)}
+            aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            aria-pressed={showPassword}
+          >
+            {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+          </button>
+        }
+        {...register('password')}
       />
 
-      {error && <p className="auth-error">{error}</p>}
+      {errors.root && (
+        <p className="auth-alert" role="alert">
+          <AlertIcon />
+          <span>{errors.root.message}</span>
+        </p>
+      )}
 
-      <Button type="submit" className="auth-button-primary">
-        Iniciar sesión
+      <Button type="submit" className="auth-button-primary w-full" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <span className="auth-button-loading">
+            <Spinner size="sm" tone="onPrimary" />
+            Iniciando sesión…
+          </span>
+        ) : (
+          'Iniciar sesión'
+        )}
       </Button>
 
+      <p className="auth-switch">
+        ¿No tenés cuenta? <Link to="/register">Creá una</Link>
+      </p>
+
       <div className="auth-divider">
-        <p className="auth-note">Acceso temporal para previsualizar el front.</p>
-        <Button variant="secondary" className="auth-button-secondary w-full mt-3" onClick={handleDevPreview}>
+        <p className="auth-note">Acceso temporal para previsualizar el front, sin pasar por el login.</p>
+        <Button
+          variant="secondary"
+          className="auth-button-secondary w-full mt-3"
+          onClick={handleDevPreview}
+          disabled={isSubmitting}
+        >
           Ver Dashboard sin iniciar sesión
         </Button>
       </div>

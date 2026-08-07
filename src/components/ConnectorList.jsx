@@ -1,3 +1,13 @@
+import ConnectorCard from './ConnectorCard'
+import { sampleConnectors } from '../data/sampleData'
+import './css/ConnectorList.css'
+
 export default function ConnectorList() {
-  return <p className="text-sm text-gray-500">Lista de conectores en construcción</p>
+  return (
+    <div className="connector-list">
+      {sampleConnectors.map((connector) => (
+        <ConnectorCard key={connector.id} connector={connector} />
+      ))}
+    </div>
+  )
 }

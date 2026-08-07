@@ -1,0 +1,61 @@
+.automation-flow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  row-gap: 0.375rem;
+  min-width: 0;
+}
+
+.automation-flow-step {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.automation-flow-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  padding: 0.3125rem;
+  border-radius: 0.5625rem;
+  flex-shrink: 0;
+}
+
+.automation-flow-icon--github {
+  background: #e9edf2;
+  color: #1f2937;
+}
+
+.automation-flow-icon--gmail {
+  background: #fdece8;
+  color: #c1391f;
+}
+
+.automation-flow-label {
+  font-size: 0.78rem;
+  color: #3d5b72;
+  line-height: 1.3;
+}
+
+.automation-flow-arrow {
+  width: 15px;
+  height: 15px;
+  color: #9bb3c7;
+  flex-shrink: 0;
+}
+
+.automation-flow--compact .automation-flow-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0.25rem;
+}
+
+@media (max-width: 640px) {
+  .automation-flow-label {
+    display: none;
+  }
+}

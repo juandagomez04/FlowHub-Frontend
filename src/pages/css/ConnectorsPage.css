@@ -1,0 +1,19 @@
+.connectors-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.connectors-subtitle {
+  margin: 0;
+  max-width: 42rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #4a657c;
+}
+
+.connectors-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #90a5b8;
+}
