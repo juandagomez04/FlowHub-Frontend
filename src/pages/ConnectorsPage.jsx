@@ -10,7 +10,6 @@ export default function ConnectorsPage() {
 
       <ConnectorList />
 
-      <p className="connectors-note">Estamos trabajando para sumar más conectores próximamente.</p>
     </div>
   )
 }

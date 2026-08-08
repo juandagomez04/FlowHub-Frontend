@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { register as registerUser } from '../api/auth.api'
 import Button from './Button'
 import Input from './Input'
 import Spinner from './Spinner'
@@ -37,13 +38,14 @@ export default function RegisterForm() {
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
   })
 
-  const onSubmit = async ({ name, email }) => {
+  const onSubmit = async ({ name, email, password }) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      login({ name, email }, 'demo-token')
+      const response = await registerUser({ name, email, password })
+      login(response.user, 'demo-token')
       navigate('/dashboard')
-    } catch {
-      setError('root', { message: 'No pudimos crear tu cuenta. Intentá nuevamente.' })
+    } catch (error) {
+      const message = error?.response?.data?.message || 'No pudimos crear tu cuenta. Intentá nuevamente.'
+      setError('root', { message })
     }
   }
 
