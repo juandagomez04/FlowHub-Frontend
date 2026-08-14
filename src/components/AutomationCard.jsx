@@ -10,7 +10,11 @@ export default function AutomationCard({ automation, onToggle, style }) {
     <article className="automation-card" style={style}>
       <div className="automation-card-main">
         <div className="automation-card-heading">
-          <h3 className="automation-card-name">{automation.name}</h3>
+          <h3 className="automation-card-name">
+            <Link to={`/automations/${automation.id}`} className="automation-card-name-link">
+              {automation.name}
+            </Link>
+          </h3>
           <Badge variant={isActive ? 'success' : 'default'}>{isActive ? 'Activa' : 'Pausada'}</Badge>
         </div>
 
@@ -20,13 +24,6 @@ export default function AutomationCard({ automation, onToggle, style }) {
       </div>
 
       <div className="automation-card-side">
-        <Link
-          to={`/automations/${automation.id}`}
-          className="automation-edit"
-          aria-label={`Editar ${automation.name}`}
-        >
-          Editar
-        </Link>
         <button
           type="button"
           className={`automation-toggle${isActive ? ' is-on' : ''}`}

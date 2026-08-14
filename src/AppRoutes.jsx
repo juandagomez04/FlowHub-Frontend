@@ -11,6 +11,7 @@ import AutomationsListPage from './pages/AutomationsListPage'
 import AutomationBuilderPage from './pages/AutomationBuilderPage'
 import ConnectorsPage from './pages/ConnectorsPage'
 import ExecutionHistoryPage from './pages/ExecutionHistoryPage'
+import ProfilePage from './pages/ProfilePage'
 
 export default function AppRoutes() {
   return (
@@ -30,6 +31,7 @@ export default function AppRoutes() {
           <Route path="/automations/:id" element={<AutomationBuilderPage />} />
           <Route path="/connectors" element={<ConnectorsPage />} />
           <Route path="/history" element={<ExecutionHistoryPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
 

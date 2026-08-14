@@ -1,5 +1,11 @@
-export const getConnectors = async () => {}
+import axiosClient from './axiosClient'
 
-export const connectProvider = async (provider) => {}
+export const getConnections = async () => {
+  const response = await axiosClient.get('/connectors')
+  return response.data.connections
+}
 
-export const revokeConnector = async (connectorId) => {}
+export const disconnectConnector = async (provider) => {
+  const response = await axiosClient.delete(`/connectors/${provider}`)
+  return response.data
+}

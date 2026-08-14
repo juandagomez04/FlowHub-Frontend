@@ -10,8 +10,8 @@
 }
 
 .automation-card {
-  background: #ffffff;
-  border: 1px solid rgba(118, 145, 167, 0.16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 1.5rem;
   box-shadow: 0 16px 36px rgba(16, 43, 68, 0.06);
   padding: 1.75rem;
@@ -42,14 +42,30 @@
   margin: 0;
   font-size: 1.0625rem;
   font-weight: 700;
-  color: #102b44;
   line-height: 1.3;
+}
+
+.automation-card-name-link {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  transition: color 0.15s ease;
+}
+
+.automation-card-name-link:hover {
+  color: var(--color-accent-emphasis);
+}
+
+.automation-card-name-link:focus-visible {
+  outline: none;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 3px rgba(53, 114, 168, 0.25);
 }
 
 .automation-card-runs {
   margin: 0;
   font-size: 0.8rem;
-  color: #6c8aa7;
+  color: var(--color-text-muted);
 }
 
 .automation-card-side {
@@ -61,32 +77,13 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding-left: 1.75rem;
-  border-left: 1px solid rgba(118, 145, 167, 0.14);
+  border-left: 1px solid var(--color-border);
   text-align: center;
-}
-
-.automation-edit {
-  color: #3572a8;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.automation-edit:hover {
-  color: #204064;
-  text-decoration: underline;
-}
-
-.automation-edit:focus-visible {
-  outline: none;
-  border-radius: 0.25rem;
-  box-shadow: 0 0 0 3px rgba(53, 114, 168, 0.25);
 }
 
 .automation-card-last {
   font-size: 0.78rem;
-  color: #6c8aa7;
+  color: var(--color-text-muted);
 }
 
 .automation-toggle {
@@ -107,13 +104,13 @@
   width: 2.5rem;
   height: 1.375rem;
   border-radius: 999px;
-  background: #d7e2ec;
+  background: var(--color-surface-muted);
   position: relative;
   transition: background-color 0.2s ease;
 }
 
 .automation-toggle.is-on .automation-toggle-track {
-  background: linear-gradient(135deg, #4f94d1, #2c5f8f);
+  background: linear-gradient(135deg, var(--color-accent-grad-start), var(--color-accent-grad-end));
 }
 
 .automation-toggle-thumb {
@@ -155,7 +152,7 @@
     padding-left: 0;
     padding-top: 1rem;
     border-left: none;
-    border-top: 1px solid rgba(118, 145, 167, 0.14);
+    border-top: 1px solid var(--color-border);
     text-align: left;
   }
 }
@@ -167,7 +164,7 @@
 
   .automation-toggle-track,
   .automation-toggle-thumb,
-  .automation-edit {
+  .automation-card-name-link {
     transition: none;
   }
 }

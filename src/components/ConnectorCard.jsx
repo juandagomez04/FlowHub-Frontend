@@ -1,4 +1,5 @@
 import { GitHubIcon, GmailIcon } from './icons/NavIcons'
+import { useAuthStore } from '../store/authStore'
 import './css/ConnectorCard.css'
 
 const PROVIDER_ICONS = { github: GitHubIcon, gmail: GmailIcon }
@@ -7,13 +8,20 @@ export default function ConnectorCard({ connector, isConnected, onDisconnect }) 
   const Icon = PROVIDER_ICONS[connector.id]
 
   const handleConnect = () => {
+    const token = useAuthStore.getState().token
+
+    if (!token) {
+      window.alert('Iniciá sesión antes de conectar una app.')
+      return
+    }
+
     if (connector.id === 'gmail') {
-      window.location.href = 'http://localhost:3000/api/connectors/gmail/auth'
+      window.location.href = `http://localhost:3000/api/connectors/gmail/auth?token=${encodeURIComponent(token)}`
       return
     }
 
     if (connector.id === 'github') {
-      window.location.href = 'http://localhost:3000/api/connectors/github/auth'
+      window.location.href = `http://localhost:3000/api/connectors/github/auth?token=${encodeURIComponent(token)}`
       return
     }
 
@@ -31,13 +39,15 @@ export default function ConnectorCard({ connector, isConnected, onDisconnect }) 
 
   return (
     <article className="connector-card">
-      <span className={`connector-card-icon connector-card-icon--${connector.id}`}>
-        <Icon />
-      </span>
+      <div className="connector-card-top">
+        <span className={`connector-card-icon connector-card-icon--${connector.id}`}>
+          <Icon />
+        </span>
 
-      <div className="connector-card-body">
-        <h3 className="connector-card-name">{connector.name}</h3>
-        <p className="connector-card-desc">{connector.description}</p>
+        <div className="connector-card-body">
+          <h3 className="connector-card-name">{connector.name}</h3>
+          <p className="connector-card-desc">{connector.description}</p>
+        </div>
       </div>
 
       <div className="connector-card-action">

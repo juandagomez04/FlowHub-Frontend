@@ -10,16 +10,23 @@
 }
 
 .connector-card {
-  background: #ffffff;
-  border: 1px solid rgba(118, 145, 167, 0.16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 1.5rem;
   box-shadow: 0 16px 36px rgba(16, 43, 68, 0.06);
   padding: 1.75rem;
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
+  flex-direction: column;
+  gap: 1.5rem;
   min-width: 0;
   animation: connectorCardIn 0.4s ease-out both;
+}
+
+.connector-card-top {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  min-width: 0;
 }
 
 .connector-card-icon {
@@ -38,13 +45,13 @@
 }
 
 .connector-card-icon--github {
-  background: #e9edf2;
-  color: #1f2937;
+  background: var(--color-github-bg);
+  color: var(--color-github-text);
 }
 
 .connector-card-icon--gmail {
-  background: #fdece8;
-  color: #c1391f;
+  background: var(--color-danger-soft-bg);
+  color: var(--color-gmail-accent);
 }
 
 .connector-card-body {
@@ -56,28 +63,28 @@
   margin: 0 0 0.25rem;
   font-size: 1.0625rem;
   font-weight: 700;
-  color: #102b44;
+  color: var(--color-text-primary);
 }
 
 .connector-card-desc {
   margin: 0;
   font-size: 0.85rem;
-  color: #6c8aa7;
-  line-height: 1.4;
+  color: var(--color-text-muted);
+  line-height: 1.5;
 }
 
 .connector-card-action {
-  flex-shrink: 0;
   display: flex;
   align-items: center;
 }
 
 .connector-card-button {
+  width: 100%;
   min-height: 2.875rem;
   padding: 0 1.5rem;
   border-radius: 999px;
   border: none;
-  background: linear-gradient(135deg, #3572a8 0%, #204064 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
   color: #ffffff;
   font-weight: 600;
   font-size: 0.85rem;
@@ -92,14 +99,14 @@
 }
 
 .connector-card-button--connected {
-  background: #fff1f0;
-  color: #b42318;
-  border: 1px solid #f3b5ae;
+  background: var(--color-danger-soft-bg);
+  color: var(--color-danger-strong);
+  border: 1px solid var(--color-danger-soft-border);
   box-shadow: none;
 }
 
 .connector-card-button--connected:hover {
-  background: #b42318;
+  background: var(--color-danger-strong);
   color: #ffffff;
   box-shadow: 0 10px 22px rgba(180, 35, 24, 0.22);
 }
@@ -115,23 +122,6 @@
 
 .connector-card-button--connected:focus-visible {
   box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.22);
-}
-
-@media (max-width: 560px) {
-  .connector-card {
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .connector-card-action {
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  .connector-card-button {
-    width: 100%;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

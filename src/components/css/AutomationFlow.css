@@ -26,25 +26,25 @@
 }
 
 .automation-flow-icon--github {
-  background: #e9edf2;
-  color: #1f2937;
+  background: var(--color-github-bg);
+  color: var(--color-github-text);
 }
 
 .automation-flow-icon--gmail {
-  background: #fdece8;
-  color: #c1391f;
+  background: var(--color-danger-soft-bg);
+  color: var(--color-gmail-accent);
 }
 
 .automation-flow-label {
   font-size: 0.78rem;
-  color: #3d5b72;
+  color: var(--color-text-secondary);
   line-height: 1.3;
 }
 
 .automation-flow-arrow {
   width: 15px;
   height: 15px;
-  color: #9bb3c7;
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 

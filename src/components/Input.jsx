@@ -11,7 +11,7 @@ const Input = forwardRef(function Input(
   return (
     <div className={`flex flex-col gap-2 auth-input ${error ? 'auth-input--error' : ''} ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="text-sm font-medium text-slate-700">
+        <label htmlFor={inputId} className="ui-label text-sm font-medium">
           {label}
         </label>
       )}
@@ -21,7 +21,7 @@ const Input = forwardRef(function Input(
           ref={ref}
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={errorId}
-          className={`px-3 py-2 bg-white border rounded-md text-sm text-slate-900 placeholder-slate-400 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed ${endAdornment ? 'auth-input-field--with-adornment' : ''}`}
+          className={`ui-input px-3 py-2 border rounded-md text-sm focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed ${endAdornment ? 'auth-input-field--with-adornment' : ''}`}
           {...props}
         />
         {endAdornment && <div className="auth-input-adornment">{endAdornment}</div>}

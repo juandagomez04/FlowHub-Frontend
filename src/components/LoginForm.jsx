@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { login as loginRequest } from '../api/auth.api'
 import Button from './Button'
 import Input from './Input'
 import Spinner from './Spinner'
@@ -29,13 +30,14 @@ export default function LoginForm() {
     defaultValues: { email: '', password: '' },
   })
 
-  const onSubmit = async ({ email }) => {
+  const onSubmit = async ({ email, password }) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      login({ name: email.split('@')[0], email }, 'demo-token')
+      const response = await loginRequest({ email, password })
+      login(response.user, response.token)
       navigate('/dashboard')
-    } catch {
-      setError('root', { message: 'No pudimos iniciar sesión. Intentá nuevamente.' })
+    } catch (error) {
+      const message = error?.response?.data?.message || 'No pudimos iniciar sesión. Intentá nuevamente.'
+      setError('root', { message })
     }
   }
 

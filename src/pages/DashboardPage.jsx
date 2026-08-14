@@ -5,27 +5,27 @@ import ActivityChart from '../components/ActivityChart'
 import AutomationFlow from '../components/AutomationFlow'
 import { ArrowRightIcon, PlusIcon } from '../components/icons/NavIcons'
 import { dashboardSummary, sampleAutomations, sampleConnectors, weeklyActivity } from '../data/sampleData'
+import { getConnections } from '../api/connectors.api'
 import './css/DashboardPage.css'
-
-const CONNECTED_PROVIDERS_KEY = 'flowhub-connected-providers'
-
-function readConnectedProviders() {
-  try {
-    return JSON.parse(localStorage.getItem(CONNECTED_PROVIDERS_KEY) || '[]')
-  } catch {
-    return []
-  }
-}
 
 export default function DashboardPage() {
   const recentAutomations = sampleAutomations.slice(0, 4)
-  const [connectedProviders, setConnectedProviders] = useState(readConnectedProviders)
+  const [connectedProviders, setConnectedProviders] = useState([])
 
   useEffect(() => {
-    const handleStorageChange = () => setConnectedProviders(readConnectedProviders())
+    let isMounted = true
 
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
+    getConnections()
+      .then((connections) => {
+        if (isMounted) setConnectedProviders(connections.map((connection) => connection.provider))
+      })
+      .catch(() => {
+        if (isMounted) setConnectedProviders([])
+      })
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (

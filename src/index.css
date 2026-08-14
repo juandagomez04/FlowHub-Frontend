@@ -1,7 +1,143 @@
 @import "tailwindcss";
 
+:root {
+  --color-bg: #f2f6fb;
+  --color-bg-end: #e7eef7;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f7fbff;
+  --color-surface-muted: #e9eff5;
+  --color-surface-translucent: rgba(255, 255, 255, 0.92);
+
+  --color-border: rgba(118, 145, 167, 0.18);
+  --color-border-strong: rgba(118, 145, 167, 0.3);
+
+  --color-text-primary: #102b44;
+  --color-text-secondary: #4a657c;
+  --color-text-muted: #6c8aa7;
+  --color-text-faint: #90a5b8;
+  --color-input-text: #1f3a4d;
+
+  --color-accent: #3572a8;
+  --color-accent-strong: #204064;
+  --color-accent-emphasis: #204064;
+  --color-accent-darker: #16324f;
+  --color-accent-grad-start: #4f94d1;
+  --color-accent-grad-end: #2c5f8f;
+  --color-accent-light: #7ab6eb;
+  --color-accent-hover: #497fbf;
+
+  --color-danger: #b3282a;
+  --color-danger-strong: #b42318;
+  --color-danger-soft-bg: #fdece8;
+  --color-danger-soft-border: #f3b5ae;
+
+  --color-github-bg: #e9edf2;
+  --color-github-text: #1f2937;
+  --color-gmail-accent: #c1391f;
+
+  --color-input-border: #c9dff0;
+
+  --color-navy-1: #0e2338;
+  --color-navy-2: #0a1a2c;
+  --color-navy-3: #0b1f33;
+  --color-on-navy: #ffffff;
+  --color-on-navy-muted: #aec7de;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #0b131f;
+  --color-bg-end: #0a1018;
+  --color-surface: #131c2a;
+  --color-surface-alt: #182233;
+  --color-surface-muted: #1b2536;
+  --color-surface-translucent: rgba(19, 28, 42, 0.92);
+
+  --color-border: rgba(148, 173, 199, 0.16);
+  --color-border-strong: rgba(148, 173, 199, 0.28);
+
+  --color-text-primary: #eef3f9;
+  --color-text-secondary: #a9bdd1;
+  --color-text-muted: #8199b3;
+  --color-text-faint: #64798f;
+  --color-input-text: #e7edf5;
+
+  --color-accent: #5b9bd8;
+  --color-accent-strong: #1c4468;
+  --color-accent-emphasis: #8fc0ec;
+  --color-accent-darker: #123249;
+  --color-accent-grad-start: #4f94d1;
+  --color-accent-grad-end: #2c5f8f;
+  --color-accent-light: #7ab6eb;
+  --color-accent-hover: #5aa4d9;
+
+  --color-danger: #f0827f;
+  --color-danger-strong: #ff8d84;
+  --color-danger-soft-bg: rgba(180, 35, 24, 0.16);
+  --color-danger-soft-border: rgba(243, 181, 174, 0.35);
+
+  --color-github-bg: #26303f;
+  --color-github-text: #dbe2ea;
+  --color-gmail-accent: #ef8b76;
+
+  --color-input-border: rgba(148, 173, 199, 0.32);
+
+  --color-on-navy: #ffffff;
+  --color-on-navy-muted: #aec7de;
+
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
-  background: #0f172a;
-  color: #e5e7eb;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+.ui-button-primary {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
+  color: #ffffff;
+}
+
+.ui-button-primary:hover {
+  background: linear-gradient(135deg, var(--color-accent-grad-end) 0%, var(--color-accent-darker) 100%);
+}
+
+.ui-button-secondary {
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.ui-button-secondary:hover {
+  background: var(--color-surface-alt);
+}
+
+.ui-button-danger {
+  background: var(--color-danger-strong);
+  color: #ffffff;
+}
+
+.ui-button-danger:hover {
+  background: var(--color-danger);
+}
+
+.ui-label {
+  color: var(--color-input-text);
+}
+
+.ui-input {
+  background: var(--color-surface);
+  border-color: var(--color-input-border);
+  color: var(--color-input-text);
+}
+
+.ui-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.ui-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(53, 114, 168, 0.16);
 }

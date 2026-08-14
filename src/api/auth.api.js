@@ -10,6 +10,11 @@ export const register = async (data) => {
   return response.data
 }
 
+export const changePassword = async (data) => {
+  const response = await axiosClient.put('/auth/password', data)
+  return response.data
+}
+
 export const logout = async () => {}
 
 export const refreshToken = async () => {}

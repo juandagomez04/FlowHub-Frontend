@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import ConnectorCard from './ConnectorCard'
 import { sampleConnectors } from '../data/sampleData'
+import { getConnections, disconnectConnector } from '../api/connectors.api'
 import './css/ConnectorList.css'
 
 export default function ConnectorList() {
@@ -11,42 +12,47 @@ export default function ConnectorList() {
   )
 }
 
-const STORAGE_KEY = 'flowhub-connected-providers'
-
-function readConnectedProviders() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-  } catch {
-    return []
-  }
-}
-
 function ConnectorCards() {
-  const [connectedProviders, setConnectedProviders] = useState(readConnectedProviders)
+  const [connectedProviders, setConnectedProviders] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const loadConnections = async () => {
+    try {
+      const connections = await getConnections()
+      setConnectedProviders(connections.map((connection) => connection.provider))
+    } catch {
+      setConnectedProviders([])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const connectedProvider = new URLSearchParams(window.location.search).get('connected')
+    const params = new URLSearchParams(window.location.search)
+    const oauthError = params.get('oauth_error')
 
-    if (connectedProvider && sampleConnectors.some((connector) => connector.id === connectedProvider)) {
-      setConnectedProviders((providers) => {
-        const nextProviders = providers.includes(connectedProvider)
-          ? providers
-          : [...providers, connectedProvider]
+    if (oauthError) {
+      window.alert(oauthError)
+    }
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(nextProviders))
-        return nextProviders
-      })
-
+    if (params.has('connected') || params.has('oauth_error') || params.has('email') || params.has('login')) {
       window.history.replaceState({}, document.title, window.location.pathname)
     }
+
+    loadConnections()
   }, [])
 
-  const handleDisconnect = (providerId) => {
-    setConnectedProviders((providers) => {
-      const nextProviders = providers.filter((provider) => provider !== providerId)
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextProviders))
-      return nextProviders
-    })
+  const handleDisconnect = async (providerId) => {
+    try {
+      await disconnectConnector(providerId)
+      setConnectedProviders((providers) => providers.filter((provider) => provider !== providerId))
+    } catch {
+      window.alert('No pudimos desconectar esa app. Intentá de nuevo.')
+    }
+  }
+
+  if (loading) {
+    return null
   }
 
   return sampleConnectors.map((connector) => (

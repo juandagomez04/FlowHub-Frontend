@@ -11,6 +11,7 @@ import {
   DashboardIcon,
   HistoryIcon,
   LogoutIcon,
+  UserIcon,
 } from './icons/NavIcons'
 
 const NAV_ITEMS = [
@@ -25,6 +26,7 @@ const PAGE_TITLES = [
   { match: '/automations', title: 'Automatizaciones' },
   { match: '/connectors', title: 'Conectores' },
   { match: '/history', title: 'Historial de ejecuciones' },
+  { match: '/profile', title: 'Editar perfil' },
 ]
 
 export default function AppLayout() {
@@ -169,7 +171,21 @@ export default function AppLayout() {
               </button>
               {userMenuOpen && (
                 <div className="app-user-menu" role="menu">
-                  <button type="button" className="app-user-menu-item" onClick={handleLogout} role="menuitem">
+                  <Link
+                    to="/profile"
+                    className="app-user-menu-item"
+                    role="menuitem"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    <UserIcon />
+                    Editar perfil
+                  </Link>
+                  <button
+                    type="button"
+                    className="app-user-menu-item app-user-menu-item--danger"
+                    onClick={handleLogout}
+                    role="menuitem"
+                  >
                     <LogoutIcon />
                     Cerrar sesión
                   </button>

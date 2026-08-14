@@ -1,8 +1,8 @@
 export default function Button({ children, type = 'button', variant = 'primary', className = '', ...props }) {
   const variants = {
-    primary: 'bg-sky-600 text-white hover:bg-sky-700',
-    secondary: 'bg-transparent border border-slate-300 text-slate-900 hover:bg-slate-100',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
+    primary: 'ui-button-primary',
+    secondary: 'ui-button-secondary',
+    danger: 'ui-button-danger',
   }
 
   return (

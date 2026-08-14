@@ -41,7 +41,7 @@ export default function RegisterForm() {
   const onSubmit = async ({ name, email, password }) => {
     try {
       const response = await registerUser({ name, email, password })
-      login(response.user, 'demo-token')
+      login(response.user, response.token)
       navigate('/dashboard')
     } catch (error) {
       const message = error?.response?.data?.message || 'No pudimos crear tu cuenta. Intentá nuevamente.'
