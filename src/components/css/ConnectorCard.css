@@ -91,6 +91,19 @@
   box-shadow: 0 14px 26px rgba(53, 114, 168, 0.32);
 }
 
+.connector-card-button--connected {
+  background: #fff1f0;
+  color: #b42318;
+  border: 1px solid #f3b5ae;
+  box-shadow: none;
+}
+
+.connector-card-button--connected:hover {
+  background: #b42318;
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(180, 35, 24, 0.22);
+}
+
 .connector-card-button:active {
   transform: translateY(0) scale(0.98);
 }
@@ -98,6 +111,10 @@
 .connector-card-button:focus-visible {
   outline: none;
   box-shadow: 0 0 0 4px rgba(53, 114, 168, 0.3);
+}
+
+.connector-card-button--connected:focus-visible {
+  box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.22);
 }
 
 @media (max-width: 560px) {

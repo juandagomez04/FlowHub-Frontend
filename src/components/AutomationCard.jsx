@@ -1,5 +1,6 @@
 import Badge from './Badge'
 import AutomationFlow from './AutomationFlow'
+import { Link } from 'react-router-dom'
 import './css/AutomationCard.css'
 
 export default function AutomationCard({ automation, onToggle, style }) {
@@ -19,6 +20,13 @@ export default function AutomationCard({ automation, onToggle, style }) {
       </div>
 
       <div className="automation-card-side">
+        <Link
+          to={`/automations/${automation.id}`}
+          className="automation-edit"
+          aria-label={`Editar ${automation.name}`}
+        >
+          Editar
+        </Link>
         <button
           type="button"
           className={`automation-toggle${isActive ? ' is-on' : ''}`}

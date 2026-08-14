@@ -65,6 +65,25 @@
   text-align: center;
 }
 
+.automation-edit {
+  color: #3572a8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.automation-edit:hover {
+  color: #204064;
+  text-decoration: underline;
+}
+
+.automation-edit:focus-visible {
+  outline: none;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 3px rgba(53, 114, 168, 0.25);
+}
+
 .automation-card-last {
   font-size: 0.78rem;
   color: #6c8aa7;
@@ -147,7 +166,8 @@
   }
 
   .automation-toggle-track,
-  .automation-toggle-thumb {
+  .automation-toggle-thumb,
+  .automation-edit {
     transition: none;
   }
 }

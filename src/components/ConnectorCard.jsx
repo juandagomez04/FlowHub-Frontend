@@ -3,7 +3,7 @@ import './css/ConnectorCard.css'
 
 const PROVIDER_ICONS = { github: GitHubIcon, gmail: GmailIcon }
 
-export default function ConnectorCard({ connector }) {
+export default function ConnectorCard({ connector, isConnected, onDisconnect }) {
   const Icon = PROVIDER_ICONS[connector.id]
 
   const handleConnect = () => {
@@ -12,7 +12,21 @@ export default function ConnectorCard({ connector }) {
       return
     }
 
+    if (connector.id === 'github') {
+      window.location.href = 'http://localhost:3000/api/connectors/github/auth'
+      return
+    }
+
     window.alert('Este proveedor aún no está habilitado en esta parte del proyecto.')
+  }
+
+  const handleAction = () => {
+    if (isConnected) {
+      onDisconnect(connector.id)
+      return
+    }
+
+    handleConnect()
   }
 
   return (
@@ -27,8 +41,12 @@ export default function ConnectorCard({ connector }) {
       </div>
 
       <div className="connector-card-action">
-        <button type="button" className="connector-card-button" onClick={handleConnect}>
-          Conectar
+        <button
+          type="button"
+          className={`connector-card-button${isConnected ? ' connector-card-button--connected' : ''}`}
+          onClick={handleAction}
+        >
+          {isConnected ? 'Desconectar' : 'Conectar'}
         </button>
       </div>
     </article>

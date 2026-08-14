@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Badge from '../components/Badge'
 import ActivityChart from '../components/ActivityChart'
@@ -6,8 +7,26 @@ import { ArrowRightIcon, PlusIcon } from '../components/icons/NavIcons'
 import { dashboardSummary, sampleAutomations, sampleConnectors, weeklyActivity } from '../data/sampleData'
 import './css/DashboardPage.css'
 
+const CONNECTED_PROVIDERS_KEY = 'flowhub-connected-providers'
+
+function readConnectedProviders() {
+  try {
+    return JSON.parse(localStorage.getItem(CONNECTED_PROVIDERS_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
 export default function DashboardPage() {
   const recentAutomations = sampleAutomations.slice(0, 4)
+  const [connectedProviders, setConnectedProviders] = useState(readConnectedProviders)
+
+  useEffect(() => {
+    const handleStorageChange = () => setConnectedProviders(readConnectedProviders())
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   return (
     <div className="dash">
@@ -40,13 +59,11 @@ export default function DashboardPage() {
                   <p className="dash-connector-name">{connector.name}</p>
                   <p className="dash-connector-desc">{connector.description}</p>
                 </div>
-                <Badge variant="success">Conectado</Badge>
+                <Badge variant={connectedProviders.includes(connector.id) ? 'success' : 'default'}>
+                  {connectedProviders.includes(connector.id) ? 'Conectado' : 'Desconectado'}
+                </Badge>
               </div>
             ))}
-            <Link to="/connectors" className="dash-connector-card dash-connector-card--add">
-              <PlusIcon />
-              Conectar otra app
-            </Link>
           </div>
         </div>
       </section>
