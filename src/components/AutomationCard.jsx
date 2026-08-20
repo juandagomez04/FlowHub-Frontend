@@ -3,7 +3,7 @@ import AutomationFlow from './AutomationFlow'
 import { Link } from 'react-router-dom'
 import './css/AutomationCard.css'
 
-export default function AutomationCard({ automation, onToggle, style }) {
+export default function AutomationCard({ automation, onToggle, onDelete, style }) {
   const isActive = automation.status === 'active'
 
   return (
@@ -35,6 +35,9 @@ export default function AutomationCard({ automation, onToggle, style }) {
           <span className="automation-toggle-track">
             <span className="automation-toggle-thumb" />
           </span>
+        </button>
+        <button type="button" onClick={onDelete} aria-label={`Eliminar ${automation.name}`}>
+          Eliminar
         </button>
         <span className="automation-card-last">{automation.lastRunLabel}</span>
       </div>

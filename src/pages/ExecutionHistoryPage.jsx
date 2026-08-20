@@ -1,3 +1,5 @@
+import './css/ExecutionHistoryPage.css'
+
 export default function ExecutionHistoryPage() {
-  return <h1 className="text-xl font-semibold">Historial de ejecuciones</h1>
+  return <h1 className="history-title">Historial de ejecuciones</h1>
 }

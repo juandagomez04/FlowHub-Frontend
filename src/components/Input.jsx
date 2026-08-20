@@ -1,4 +1,5 @@
 import { forwardRef, useId } from 'react'
+import './css/Input.css'
 
 const Input = forwardRef(function Input(
   { label, error, endAdornment, className = '', id, ...props },
@@ -9,9 +10,9 @@ const Input = forwardRef(function Input(
   const errorId = error ? `${inputId}-error` : undefined
 
   return (
-    <div className={`flex flex-col gap-2 auth-input ${error ? 'auth-input--error' : ''} ${className}`}>
+    <div className={`input-control auth-input ${error ? 'auth-input--error' : ''} ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="ui-label text-sm font-medium">
+        <label htmlFor={inputId} className="ui-label input-label">
           {label}
         </label>
       )}
@@ -21,7 +22,7 @@ const Input = forwardRef(function Input(
           ref={ref}
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={errorId}
-          className={`ui-input px-3 py-2 border rounded-md text-sm focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed ${endAdornment ? 'auth-input-field--with-adornment' : ''}`}
+          className={`ui-input input-field ${endAdornment ? 'auth-input-field--with-adornment' : ''}`}
           {...props}
         />
         {endAdornment && <div className="auth-input-adornment">{endAdornment}</div>}

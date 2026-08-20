@@ -1,0 +1,154 @@
+.automation-builder-page {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem 0 2.25rem;
+}
+
+.automation-builder-form {
+  width: min(980px, 100%);
+  display: grid;
+  gap: 1rem;
+}
+
+.automation-builder-header h1 {
+  margin: 0;
+  font-size: 1.55rem;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.automation-builder-header p {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.automation-builder-card {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-translucent);
+  border-radius: 14px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.75rem;
+  box-shadow: 0 6px 20px rgba(16, 43, 68, 0.06);
+}
+
+.automation-builder-card h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+}
+
+.automation-builder-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.automation-builder-field span {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.automation-builder-form .ui-input {
+  width: 100%;
+  border: 1px solid var(--color-input-border);
+  border-radius: 10px;
+  padding: 0.62rem 0.72rem;
+  font: inherit;
+}
+
+.automation-builder-form .ui-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.9;
+}
+
+.automation-builder-form textarea.ui-input {
+  resize: vertical;
+  min-height: 86px;
+}
+
+.automation-builder-json {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.automation-builder-grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.automation-builder-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.automation-builder-fieldset {
+  margin: 0;
+  min-width: 0;
+}
+
+.automation-builder-fieldset legend {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  padding: 0;
+  margin-bottom: 0.6rem;
+}
+
+.automation-builder-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.automation-builder-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+}
+
+.automation-builder-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.automation-builder-submit {
+  border: none;
+  border-radius: 10px;
+  padding: 0.72rem 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.automation-builder-error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.9rem;
+}
+
+.automation-builder-loading {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 900px) {
+  .automation-builder-grid-two,
+  .automation-builder-split {
+    grid-template-columns: 1fr;
+  }
+
+  .automation-builder-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .automation-builder-submit {
+    width: 100%;
+  }
+}

@@ -92,7 +92,7 @@ export default function LoginForm() {
         </p>
       )}
 
-      <Button type="submit" className="auth-button-primary w-full" disabled={isSubmitting}>
+      <Button type="submit" className="auth-button-primary auth-button-block" disabled={isSubmitting}>
         {isSubmitting ? (
           <span className="auth-button-loading">
             <Spinner size="sm" tone="onPrimary" />
@@ -111,7 +111,7 @@ export default function LoginForm() {
         <p className="auth-note">Acceso temporal para previsualizar el front, sin pasar por el login.</p>
         <Button
           variant="secondary"
-          className="auth-button-secondary w-full mt-3"
+          className="auth-button-secondary auth-button-block auth-button-spaced"
           onClick={handleDevPreview}
           disabled={isSubmitting}
         >

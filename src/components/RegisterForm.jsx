@@ -126,7 +126,7 @@ export default function RegisterForm() {
         </p>
       )}
 
-      <Button type="submit" className="auth-button-primary w-full" disabled={isSubmitting}>
+      <Button type="submit" className="auth-button-primary auth-button-block" disabled={isSubmitting}>
         {isSubmitting ? (
           <span className="auth-button-loading">
             <Spinner size="sm" tone="onPrimary" />

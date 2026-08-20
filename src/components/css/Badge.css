@@ -1,0 +1,36 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.badge--default {
+  background: rgba(76, 105, 130, 0.1);
+  color: #3d5b72;
+}
+
+.badge--success {
+  background: rgba(27, 122, 69, 0.1);
+  color: #1b7a45;
+}
+
+.badge--error {
+  background: rgba(208, 68, 69, 0.1);
+  color: #b3282a;
+}
+
+.badge--warning {
+  background: rgba(146, 96, 10, 0.12);
+  color: #92600a;
+}

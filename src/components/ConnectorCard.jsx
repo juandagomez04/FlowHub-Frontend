@@ -1,5 +1,6 @@
 import { GitHubIcon, GmailIcon } from './icons/NavIcons'
 import { useAuthStore } from '../store/authStore'
+import axiosClient from '../api/axiosClient'
 import './css/ConnectorCard.css'
 
 const PROVIDER_ICONS = { github: GitHubIcon, gmail: GmailIcon }
@@ -7,25 +8,23 @@ const PROVIDER_ICONS = { github: GitHubIcon, gmail: GmailIcon }
 export default function ConnectorCard({ connector, isConnected, onDisconnect }) {
   const Icon = PROVIDER_ICONS[connector.id]
 
-  const handleConnect = () => {
-    const token = useAuthStore.getState().token
-
-    if (!token) {
+  const handleConnect = async () => {
+    if (!useAuthStore.getState().token) {
       window.alert('Iniciá sesión antes de conectar una app.')
       return
     }
 
-    if (connector.id === 'gmail') {
-      window.location.href = `http://localhost:3000/api/connectors/gmail/auth?token=${encodeURIComponent(token)}`
+    if (connector.id !== 'gmail' && connector.id !== 'github') {
+      window.alert('Este proveedor aún no está habilitado en esta parte del proyecto.')
       return
     }
 
-    if (connector.id === 'github') {
-      window.location.href = `http://localhost:3000/api/connectors/github/auth?token=${encodeURIComponent(token)}`
-      return
+    try {
+      const response = await axiosClient.get(`/connectors/${connector.id}/auth`)
+      window.location.href = response.data.authorizationUrl
+    } catch (error) {
+      window.alert(error.response?.data?.message || 'No fue posible iniciar la conexión.')
     }
-
-    window.alert('Este proveedor aún no está habilitado en esta parte del proyecto.')
   }
 
   const handleAction = () => {

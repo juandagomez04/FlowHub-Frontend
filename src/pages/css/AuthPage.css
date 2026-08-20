@@ -356,6 +356,14 @@
   gap: 0.5rem;
 }
 
+.auth-button-block {
+  width: 100%;
+}
+
+.auth-button-spaced {
+  margin-top: 0.75rem;
+}
+
 .auth-button-secondary {
   background: transparent;
   color: var(--color-input-text);
