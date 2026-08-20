@@ -1,21 +1,32 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { createAutomation, getAutomation, updateAutomation } from '../api/automations.api'
+import ServicePicker from '../components/ServicePicker'
+import ScheduleFrequencyField from '../components/ScheduleFrequencyField'
+import AutomationActionFields from '../components/AutomationActionFields'
+import { SCHEDULE_PRESETS, buildScheduleConfiguration, parseScheduleConfiguration } from '../utils/automationSchedule'
+import { DEFAULT_EMAIL_SUBJECT, DEFAULT_EMAIL_BODY, buildActionPayload, parseActionIntoForm } from '../utils/automationAction'
 import './css/AutomationBuilderPage.css'
+
+const initialSchedule = { unit: 'minutes', value: 1 }
 
 const initialForm = {
   name: '',
   description: '',
   isActive: false,
-  triggerType: 'schedule',
-  triggerProvider: 'gmail',
-  triggerConfiguration: '{\n  "cron": "* * * * *"\n}',
-  conditionField: '',
-  conditionOperator: 'contains',
-  conditionValue: '',
+  scheduleUnit: initialSchedule.unit,
+  scheduleValue: initialSchedule.value,
+  service: 'gmail',
   actionType: 'send_email',
-  actionProvider: 'gmail',
-  actionConfiguration: '{\n  "to": "destinatario@ejemplo.com",\n  "subject": "Prueba de FlowHub",\n  "body": "Este correo fue enviado automáticamente"\n}',
+  emailTo: '',
+  emailSubject: DEFAULT_EMAIL_SUBJECT,
+  emailBody: DEFAULT_EMAIL_BODY,
+  githubOwner: '',
+  githubRepo: '',
+  issueTitle: '',
+  issueBody: '',
+  issueNumber: '',
+  issueComment: '',
 }
 
 export default function AutomationBuilderPage() {
@@ -30,22 +41,17 @@ export default function AutomationBuilderPage() {
 
     getAutomation(id)
       .then((automation) => {
-        const condition = automation.conditions?.[0]
-        const action = automation.actions?.[0]
+        const schedule = parseScheduleConfiguration(automation.trigger?.configuration)
+        const actionFields = parseActionIntoForm(automation.actions?.[0])
+
         setForm({
           ...initialForm,
           name: automation.name,
           description: automation.description || '',
           isActive: automation.isActive,
-          triggerType: automation.trigger?.type || initialForm.triggerType,
-          triggerProvider: automation.trigger?.provider || initialForm.triggerProvider,
-          triggerConfiguration: JSON.stringify(automation.trigger?.configuration || {}, null, 2),
-          conditionField: condition?.field || '',
-          conditionOperator: condition?.operator || initialForm.conditionOperator,
-          conditionValue: condition?.value || '',
-          actionType: action?.type || initialForm.actionType,
-          actionProvider: action?.provider || initialForm.actionProvider,
-          actionConfiguration: JSON.stringify(action?.configuration || {}, null, 2),
+          scheduleUnit: schedule.unit,
+          scheduleValue: schedule.value,
+          ...actionFields,
         })
       })
       .catch((requestError) => setError(requestError.response?.data?.message || 'No fue posible cargar la automatización.'))
@@ -57,15 +63,31 @@ export default function AutomationBuilderPage() {
     setForm((previous) => ({ ...previous, [name]: type === 'checkbox' ? checked : value }))
   }
 
-  const parseJsonField = (value) => {
-    const normalized = typeof value === 'string' ? value.trim() : ''
-    if (!normalized) return {}
+  const handleFieldChange = (name, value) => {
+    setForm((previous) => ({ ...previous, [name]: value }))
+  }
 
-    try {
-      return JSON.parse(normalized)
-    } catch {
-      throw new SyntaxError('JSON inválido')
-    }
+  const handleServiceSelect = (service) => {
+    setForm((previous) => ({
+      ...previous,
+      service,
+      actionType: service === 'gmail' ? 'send_email' : (previous.actionType === 'send_email' ? 'create_issue' : previous.actionType),
+    }))
+  }
+
+  const handleSchedulePresetSelect = (presetKey) => {
+    const preset = SCHEDULE_PRESETS.find((item) => item.key === presetKey)
+    if (!preset) return
+
+    setForm((previous) => ({ ...previous, scheduleUnit: preset.unit, scheduleValue: preset.value }))
+  }
+
+  const handleScheduleFieldChange = (field, value) => {
+    setForm((previous) => ({
+      ...previous,
+      scheduleUnit: field === 'unit' ? value : previous.scheduleUnit,
+      scheduleValue: field === 'value' ? value : previous.scheduleValue,
+    }))
   }
 
   const handleSubmit = async (event) => {
@@ -78,20 +100,12 @@ export default function AutomationBuilderPage() {
         description: form.description,
         isActive: form.isActive,
         trigger: {
-          type: form.triggerType,
-          provider: form.triggerProvider,
-          configuration: parseJsonField(form.triggerConfiguration),
+          type: 'schedule',
+          provider: form.service,
+          configuration: buildScheduleConfiguration(form.scheduleUnit, form.scheduleValue),
         },
-        conditions: form.conditionField
-          ? [{ field: form.conditionField, operator: form.conditionOperator, value: form.conditionValue }]
-          : [],
-        actions: [
-          {
-            type: form.actionType,
-            provider: form.actionProvider,
-            configuration: parseJsonField(form.actionConfiguration),
-          },
-        ],
+        conditions: [],
+        actions: [buildActionPayload(form)],
       }
 
       if (id) {
@@ -102,7 +116,7 @@ export default function AutomationBuilderPage() {
 
       navigate('/automations')
     } catch (requestError) {
-      setError(requestError instanceof SyntaxError ? 'La configuración debe ser un JSON válido.' : requestError.response?.data?.message || 'No fue posible guardar la automatización.')
+      setError(requestError.response?.data?.message || 'No fue posible guardar la automatización.')
     }
   }
 
@@ -113,7 +127,7 @@ export default function AutomationBuilderPage() {
       <form onSubmit={handleSubmit} className="automation-builder-form">
         <header className="automation-builder-header">
           <h1>{id ? 'Editar automatización' : 'Nueva automatización'}</h1>
-          <p>Configurá trigger, condición y acción en un solo flujo.</p>
+          <p>Elegí el servicio, la frecuencia y completá los datos de la acción.</p>
         </header>
 
         <section className="automation-builder-card">
@@ -143,70 +157,23 @@ export default function AutomationBuilderPage() {
         </section>
 
         <section className="automation-builder-card">
-          <h2>Trigger</h2>
+          <h2>Servicio</h2>
+          <p className="automation-builder-hint">Elegí qué conector va a ejecutar esta automatización.</p>
 
-          <div className="automation-builder-grid-two">
-            <label className="automation-builder-field">
-              <span>Tipo de trigger</span>
-              <select name="triggerType" value={form.triggerType} onChange={handleChange} className="ui-input">
-                <option value="webhook_event">Evento por webhook</option>
-                <option value="schedule">Programado</option>
-              </select>
-            </label>
+          <ServicePicker service={form.service} onSelect={handleServiceSelect} />
 
-            <label className="automation-builder-field">
-              <span>Proveedor del trigger</span>
-              <select name="triggerProvider" value={form.triggerProvider} onChange={handleChange} className="ui-input">
-                <option value="github">GitHub</option>
-                <option value="gmail">Gmail</option>
-              </select>
-            </label>
-          </div>
-
-          <label className="automation-builder-field">
-            <span>Configuración del trigger (JSON)</span>
-            <textarea
-              name="triggerConfiguration"
-              value={form.triggerConfiguration}
-              onChange={handleChange}
-              rows="5"
-              className="ui-input automation-builder-json"
-            />
-          </label>
+          <ScheduleFrequencyField
+            unit={form.scheduleUnit}
+            value={form.scheduleValue}
+            onFieldChange={handleScheduleFieldChange}
+            onPresetSelect={handleSchedulePresetSelect}
+          />
         </section>
 
-        <div className="automation-builder-split">
-          <fieldset className="automation-builder-card automation-builder-fieldset">
-            <legend>Condición opcional</legend>
-            <input name="conditionField" value={form.conditionField} onChange={handleChange} placeholder="trigger.subject" className="ui-input" />
-            <select name="conditionOperator" value={form.conditionOperator} onChange={handleChange} className="ui-input">
-              <option value="contains">Contiene</option>
-              <option value="equals">Es igual a</option>
-              <option value="starts_with">Comienza con</option>
-            </select>
-            <input name="conditionValue" value={form.conditionValue} onChange={handleChange} placeholder="Valor esperado" className="ui-input" />
-          </fieldset>
-
-          <fieldset className="automation-builder-card automation-builder-fieldset">
-            <legend>Acción</legend>
-            <select name="actionType" value={form.actionType} onChange={handleChange} className="ui-input">
-              <option value="send_message">Enviar mensaje</option>
-              <option value="create_issue">Crear issue</option>
-              <option value="send_email">Enviar correo</option>
-            </select>
-            <select name="actionProvider" value={form.actionProvider} onChange={handleChange} className="ui-input">
-              <option value="github">GitHub</option>
-              <option value="gmail">Gmail</option>
-            </select>
-            <textarea
-              name="actionConfiguration"
-              value={form.actionConfiguration}
-              onChange={handleChange}
-              rows="5"
-              className="ui-input automation-builder-json"
-            />
-          </fieldset>
-        </div>
+        <section className="automation-builder-card">
+          <h2>Acción</h2>
+          <AutomationActionFields form={form} onFieldChange={handleFieldChange} />
+        </section>
 
         <footer className="automation-builder-footer">
           <label className="automation-builder-toggle">

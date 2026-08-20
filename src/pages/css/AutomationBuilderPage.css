@@ -68,34 +68,101 @@
   min-height: 86px;
 }
 
-.automation-builder-json {
-  font-family: Consolas, 'Courier New', monospace;
+.automation-builder-hint {
+  margin: -0.35rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.service-picker {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.service-option {
+  flex: 1;
+  border: 1px solid var(--color-input-border);
+  background: transparent;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.service-option:hover {
+  border-color: var(--color-accent, var(--color-text-primary));
+  color: var(--color-text-primary);
+}
+
+.service-option.is-active {
+  border-color: var(--color-accent, var(--color-text-primary));
+  background: var(--color-accent, var(--color-text-primary));
+  color: var(--color-surface, #fff);
+}
+
+.schedule-frequency {
+  gap: 0.65rem;
+}
+
+.schedule-value-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+}
+
+.schedule-value-row-label {
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
+}
+
+.schedule-value-input {
+  width: 72px;
+  flex: none;
+  text-align: center;
+}
+
+.schedule-unit-select {
+  flex: none;
+  width: auto;
+}
+
+.schedule-quick-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.schedule-pill {
+  border: 1px solid var(--color-input-border);
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  font: inherit;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.schedule-pill:hover {
+  border-color: var(--color-accent, var(--color-text-primary));
+  color: var(--color-text-primary);
+}
+
+.schedule-pill.is-active {
+  border-color: var(--color-accent, var(--color-text-primary));
+  background: var(--color-accent, var(--color-text-primary));
+  color: var(--color-surface, #fff);
 }
 
 .automation-builder-grid-two {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.8rem;
-}
-
-.automation-builder-split {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.automation-builder-fieldset {
-  margin: 0;
-  min-width: 0;
-}
-
-.automation-builder-fieldset legend {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  padding: 0;
-  margin-bottom: 0.6rem;
 }
 
 .automation-builder-footer {
@@ -138,8 +205,7 @@
 }
 
 @media (max-width: 900px) {
-  .automation-builder-grid-two,
-  .automation-builder-split {
+  .automation-builder-grid-two {
     grid-template-columns: 1fr;
   }
 
