@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import AutomationCard from '../components/AutomationCard'
 import { PlusIcon, SearchIcon } from '../components/icons/NavIcons'
 import { deleteAutomation, getAutomations, toggleAutomation } from '../api/automations.api'
+import { getExecutions } from '../api/executions.api'
 import './css/AutomationsListPage.css'
 
 const FILTERS = [
@@ -13,6 +14,7 @@ const FILTERS = [
 
 export default function AutomationsListPage() {
   const [automations, setAutomations] = useState([])
+  const [executions, setExecutions] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
@@ -21,9 +23,45 @@ export default function AutomationsListPage() {
   const filterListRef = useRef(null)
   const [filterIndicator, setFilterIndicator] = useState(null)
 
+  const formatLastRunLabel = (dateValue) => {
+    if (!dateValue) {
+      return 'Sin ejecuciones'
+    }
+
+    const date = new Date(dateValue)
+    if (Number.isNaN(date.getTime())) {
+      return 'Sin ejecuciones'
+    }
+
+    const diffMs = Date.now() - date.getTime()
+    const minutes = Math.floor(diffMs / (1000 * 60))
+    if (minutes < 1) return 'Hace unos segundos'
+    if (minutes < 60) return `Hace ${minutes} min`
+
+    const hours = Math.floor(minutes / 60)
+    if (hours < 24) return `Hace ${hours} h`
+
+    const days = Math.floor(hours / 24)
+    if (days < 7) return `Hace ${days} día${days === 1 ? '' : 's'}`
+
+    return date.toLocaleDateString()
+  }
+
+  const isWithinLastDays = (dateValue, days) => {
+    if (!dateValue) return false
+    const date = new Date(dateValue)
+    if (Number.isNaN(date.getTime())) return false
+
+    const delta = Date.now() - date.getTime()
+    return delta >= 0 && delta <= days * 24 * 60 * 60 * 1000
+  }
+
   useEffect(() => {
-    getAutomations()
-      .then(setAutomations)
+    Promise.all([getAutomations(), getExecutions({ limit: 500 })])
+      .then(([automationsData, executionsData]) => {
+        setAutomations(automationsData)
+        setExecutions(executionsData)
+      })
       .catch((requestError) => setError(requestError.response?.data?.message || 'No fue posible cargar las automatizaciones.'))
       .finally(() => setIsLoading(false))
   }, [])
@@ -50,15 +88,29 @@ export default function AutomationsListPage() {
     })
   }, [automations, query, filter])
 
-  const handleToggle = (id) => {
-    setAutomations((previous) =>
-      previous.map((automation) =>
-        automation.id === id
-          ? { ...automation, status: automation.status === 'active' ? 'paused' : 'active' }
-          : automation,
-      ),
-    )
-  }
+  const executionsByAutomation = useMemo(() => {
+    const map = new Map()
+
+    for (const execution of executions) {
+      const entry = map.get(execution.automationId) || { runsThisWeek: 0, latestAt: null }
+      const startedAt = execution.startedAt || execution.createdAt
+      const date = new Date(startedAt)
+
+      if (!Number.isNaN(date.getTime())) {
+        if (!entry.latestAt || date > new Date(entry.latestAt)) {
+          entry.latestAt = startedAt
+        }
+
+        if (isWithinLastDays(startedAt, 7)) {
+          entry.runsThisWeek += 1
+        }
+      }
+
+      map.set(execution.automationId, entry)
+    }
+
+    return map
+  }, [executions])
 
   return (
     <div className="automations-page">
@@ -102,22 +154,22 @@ export default function AutomationsListPage() {
         <div className="automations-empty">{error}</div>
       ) : filtered.length > 0 ? (
         <div className="automations-grid">
-          {filtered.map((automation, index) => (
+          {filtered.map((automation) => (
             <AutomationCard
               key={automation.id}
               automation={{
                 ...automation,
                 status: automation.isActive ? 'active' : 'paused',
                 trigger: {
-                  provider: automation.trigger?.provider || 'flowhub',
+                  provider: automation.trigger?.provider || 'gmail',
                   label: automation.trigger?.type || 'Sin trigger',
                 },
                 action: {
-                  provider: automation.actions?.[0]?.provider || 'flowhub',
+                  provider: automation.actions?.[0]?.provider || 'gmail',
                   label: automation.actions?.[0]?.type || 'Sin acción',
                 },
-                runsThisWeek: 0,
-                lastRunLabel: automation.updatedAt ? new Date(automation.updatedAt).toLocaleDateString() : 'Sin ejecuciones',
+                runsThisWeek: executionsByAutomation.get(automation.id)?.runsThisWeek || 0,
+                lastRunLabel: formatLastRunLabel(executionsByAutomation.get(automation.id)?.latestAt),
               }}
               onToggle={async () => {
                 const updated = await toggleAutomation(automation.id)

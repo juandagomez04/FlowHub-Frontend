@@ -1,11 +1,11 @@
-import { ArrowRightIcon, GitHubIcon, GmailIcon } from './icons/NavIcons'
+import { ArrowRightIcon, GitHubIcon, GmailIcon, BrandMarkIcon } from './icons/NavIcons'
 import './css/AutomationFlow.css'
 
-const PROVIDER_ICONS = { github: GitHubIcon, gmail: GmailIcon }
+const PROVIDER_ICONS = { github: GitHubIcon, gmail: GmailIcon, flowhub: BrandMarkIcon }
 
 export default function AutomationFlow({ trigger, action, compact = false }) {
-  const TriggerIcon = PROVIDER_ICONS[trigger.provider]
-  const ActionIcon = PROVIDER_ICONS[action.provider]
+  const TriggerIcon = PROVIDER_ICONS[trigger.provider] || BrandMarkIcon
+  const ActionIcon = PROVIDER_ICONS[action.provider] || BrandMarkIcon
 
   return (
     <div className={`automation-flow${compact ? ' automation-flow--compact' : ''}`}>

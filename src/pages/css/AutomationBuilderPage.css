@@ -74,6 +74,38 @@
   font-size: 0.85rem;
 }
 
+.automation-builder-webhook-box {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.automation-builder-webhook-label {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+}
+
+.automation-builder-webhook-url {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 0.84rem;
+  padding: 0.55rem 0.62rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
+}
+
+.automation-builder-webhook-note {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+}
+
 .service-picker {
   display: flex;
   gap: 0.6rem;

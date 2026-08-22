@@ -1,32 +1,180 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Badge from '../components/Badge'
 import ActivityChart from '../components/ActivityChart'
 import AutomationFlow from '../components/AutomationFlow'
 import { ArrowRightIcon, PlusIcon } from '../components/icons/NavIcons'
-import { dashboardSummary, sampleAutomations, sampleConnectors, weeklyActivity } from '../data/sampleData'
 import { getConnections } from '../api/connectors.api'
+import { getAutomations } from '../api/automations.api'
+import { getExecutions } from '../api/executions.api'
 import './css/DashboardPage.css'
 
+const CONNECTOR_CATALOG = [
+  { id: 'github', name: 'GitHub', description: 'Repositorios, issues y pull requests' },
+  { id: 'gmail', name: 'Gmail', description: 'Correo entrante y etiquetas' },
+]
+
+function isWithinLastDays(dateValue, days) {
+  if (!dateValue) {
+    return false
+  }
+
+  const date = new Date(dateValue)
+  if (Number.isNaN(date.getTime())) {
+    return false
+  }
+
+  const delta = Date.now() - date.getTime()
+  return delta >= 0 && delta <= days * 24 * 60 * 60 * 1000
+}
+
+function formatLastRunLabel(dateValue) {
+  if (!dateValue) {
+    return 'Sin ejecuciones'
+  }
+
+  const date = new Date(dateValue)
+  if (Number.isNaN(date.getTime())) {
+    return 'Sin ejecuciones'
+  }
+
+  const diffMs = Date.now() - date.getTime()
+  const minutes = Math.floor(diffMs / (1000 * 60))
+  if (minutes < 1) return 'Hace unos segundos'
+  if (minutes < 60) return `Hace ${minutes} min`
+
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `Hace ${hours} h`
+
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `Hace ${days} día${days === 1 ? '' : 's'}`
+
+  return date.toLocaleDateString()
+}
+
+function prettifyType(type) {
+  return String(type || 'Sin definir').replaceAll('_', ' ')
+}
+
+function buildWeeklyActivity(executions) {
+  const now = new Date()
+  const days = []
+
+  for (let offset = 6; offset >= 0; offset -= 1) {
+    const day = new Date(now)
+    day.setHours(0, 0, 0, 0)
+    day.setDate(now.getDate() - offset)
+    days.push(day)
+  }
+
+  return days.map((day) => {
+    const dayEnd = new Date(day)
+    dayEnd.setDate(dayEnd.getDate() + 1)
+
+    const runs = executions.filter((execution) => {
+      const startedAt = new Date(execution.startedAt || execution.createdAt)
+      return !Number.isNaN(startedAt.getTime()) && startedAt >= day && startedAt < dayEnd
+    }).length
+
+    return {
+      label: day.toLocaleDateString('es-CR', { weekday: 'short' }).replace('.', ''),
+      runs,
+    }
+  })
+}
+
 export default function DashboardPage() {
-  const recentAutomations = sampleAutomations.slice(0, 4)
+  const [automations, setAutomations] = useState([])
+  const [executions, setExecutions] = useState([])
   const [connectedProviders, setConnectedProviders] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let isMounted = true
 
-    getConnections()
-      .then((connections) => {
-        if (isMounted) setConnectedProviders(connections.map((connection) => connection.provider))
+    Promise.all([getAutomations(), getExecutions({ limit: 500 }), getConnections()])
+      .then(([automationList, executionList, connections]) => {
+        if (!isMounted) return
+
+        setAutomations(automationList)
+        setExecutions(executionList)
+        setConnectedProviders(connections.map((connection) => connection.provider))
       })
-      .catch(() => {
-        if (isMounted) setConnectedProviders([])
+      .catch((requestError) => {
+        if (!isMounted) return
+        setError(requestError?.response?.data?.message || 'No fue posible cargar el panel de control.')
+        setConnectedProviders([])
+        setAutomations([])
+        setExecutions([])
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false)
       })
 
     return () => {
       isMounted = false
     }
   }, [])
+
+  const weeklyActivity = useMemo(() => buildWeeklyActivity(executions), [executions])
+
+  const executionsByAutomation = useMemo(() => {
+    const map = new Map()
+
+    for (const execution of executions) {
+      const existing = map.get(execution.automationId)
+      const currentDate = new Date(execution.startedAt || execution.createdAt)
+      const existingDate = existing ? new Date(existing.startedAt || existing.createdAt) : null
+
+      if (!existing || currentDate > existingDate) {
+        map.set(execution.automationId, execution)
+      }
+    }
+
+    return map
+  }, [executions])
+
+  const dashboardSummary = useMemo(() => {
+    const totalRunsThisWeek = executions.filter((execution) =>
+      isWithinLastDays(execution.startedAt || execution.createdAt, 7)
+    ).length
+
+    const activeAutomations = automations.filter((automation) => automation.isActive).length
+    return { totalRunsThisWeek, activeAutomations }
+  }, [automations, executions])
+
+  const recentAutomations = useMemo(() => {
+    return [...automations]
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      .slice(0, 4)
+      .map((automation) => {
+        const lastExecution = executionsByAutomation.get(automation.id)
+
+        return {
+          id: automation.id,
+          name: automation.name,
+          status: automation.isActive ? 'active' : 'paused',
+          trigger: {
+            provider: automation.trigger?.provider || 'gmail',
+            label: prettifyType(automation.trigger?.type),
+          },
+          action: {
+            provider: automation.actions?.[0]?.provider || 'gmail',
+            label: prettifyType(automation.actions?.[0]?.type),
+          },
+          lastRunLabel: formatLastRunLabel(lastExecution?.startedAt || lastExecution?.createdAt),
+        }
+      })
+  }, [automations, executionsByAutomation])
+
+  if (isLoading) {
+    return <div className="dash">Cargando panel...</div>
+  }
+
+  if (error) {
+    return <div className="dash">{error}</div>
+  }
 
   return (
     <div className="dash">
@@ -41,7 +189,7 @@ export default function DashboardPage() {
               </p>
             </div>
             <p className="dash-activity-sub">
-              {dashboardSummary.activeAutomations} de {sampleAutomations.length} automatizaciones activas
+              {dashboardSummary.activeAutomations} de {automations.length} automatizaciones activas
             </p>
           </div>
           <ActivityChart data={weeklyActivity} />
@@ -50,7 +198,7 @@ export default function DashboardPage() {
         <div className="dash-connectors">
           <p className="dash-section-label">Tus conectores</p>
           <div className="dash-connectors-grid">
-            {sampleConnectors.map((connector) => (
+            {CONNECTOR_CATALOG.map((connector) => (
               <div key={connector.id} className="dash-connector-card">
                 <span className={`dash-connector-icon dash-connector-icon--${connector.id}`}>
                   {connector.id === 'github' ? <GitHubMark /> : <GmailMark />}

@@ -14,8 +14,10 @@ const initialForm = {
   name: '',
   description: '',
   isActive: false,
+  triggerType: 'schedule',
   scheduleUnit: initialSchedule.unit,
   scheduleValue: initialSchedule.value,
+  webhookSecret: '',
   service: 'gmail',
   actionType: 'send_email',
   emailTo: '',
@@ -36,6 +38,10 @@ export default function AutomationBuilderPage() {
   const [isLoading, setIsLoading] = useState(Boolean(id))
   const [error, setError] = useState('')
 
+  const webhookUrl = id
+    ? `${(import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/$/, '')}/triggers/webhook/${id}`
+    : ''
+
   useEffect(() => {
     if (!id) return
 
@@ -43,14 +49,17 @@ export default function AutomationBuilderPage() {
       .then((automation) => {
         const schedule = parseScheduleConfiguration(automation.trigger?.configuration)
         const actionFields = parseActionIntoForm(automation.actions?.[0])
+        const triggerType = automation.trigger?.type === 'webhook' ? 'webhook' : 'schedule'
 
         setForm({
           ...initialForm,
           name: automation.name,
           description: automation.description || '',
           isActive: automation.isActive,
+          triggerType,
           scheduleUnit: schedule.unit,
           scheduleValue: schedule.value,
+          webhookSecret: automation.trigger?.configuration?.secret || '',
           ...actionFields,
         })
       })
@@ -95,17 +104,28 @@ export default function AutomationBuilderPage() {
     setError('')
 
     try {
+      const trigger =
+        form.triggerType === 'webhook'
+          ? {
+              type: 'webhook',
+              provider: 'flowhub',
+              configuration: {
+                ...(form.webhookSecret.trim() ? { secret: form.webhookSecret.trim() } : {}),
+              },
+            }
+          : {
+              type: 'schedule',
+              provider: form.service,
+              configuration: buildScheduleConfiguration(form.scheduleUnit, form.scheduleValue),
+            }
+
       const payload = {
         name: form.name,
         description: form.description,
         isActive: form.isActive,
-        trigger: {
-          type: 'schedule',
-          provider: form.service,
-          configuration: buildScheduleConfiguration(form.scheduleUnit, form.scheduleValue),
-        },
+        trigger,
         conditions: [],
-        actions: [buildActionPayload(form)],
+        actions: [{ ...buildActionPayload(form), position: 0 }],
       }
 
       if (id) {
@@ -157,17 +177,68 @@ export default function AutomationBuilderPage() {
         </section>
 
         <section className="automation-builder-card">
-          <h2>Servicio</h2>
-          <p className="automation-builder-hint">Elegí qué conector va a ejecutar esta automatización.</p>
+          <h2>Trigger</h2>
+
+          <label className="automation-builder-field">
+            <span>Tipo de trigger</span>
+            <select
+              name="triggerType"
+              value={form.triggerType}
+              onChange={handleChange}
+              className="ui-input"
+            >
+              <option value="schedule">Schedule (tiempo)</option>
+              <option value="webhook">Webhook (evento)</option>
+            </select>
+          </label>
+
+          {form.triggerType === 'schedule' ? (
+            <>
+              <p className="automation-builder-hint">Ejecuta la automatización por frecuencia de tiempo.</p>
+              <ScheduleFrequencyField
+                unit={form.scheduleUnit}
+                value={form.scheduleValue}
+                onFieldChange={handleScheduleFieldChange}
+                onPresetSelect={handleSchedulePresetSelect}
+              />
+            </>
+          ) : (
+            <div className="automation-builder-webhook-box">
+              <p className="automation-builder-hint">Ejecuta esta automatización cuando reciba un POST.</p>
+
+              <label className="automation-builder-field">
+                <span>Secret (opcional)</span>
+                <input
+                  name="webhookSecret"
+                  value={form.webhookSecret}
+                  onChange={handleChange}
+                  className="ui-input"
+                  placeholder="ej: mi-clave-webhook"
+                />
+              </label>
+
+              {id ? (
+                <>
+                  <p className="automation-builder-webhook-label">URL del webhook</p>
+                  <code className="automation-builder-webhook-url">{webhookUrl}</code>
+                  <p className="automation-builder-webhook-note">
+                    Enviá POST con JSON. Si definiste secret, mandalo en header x-flowhub-secret.
+                  </p>
+                </>
+              ) : (
+                <p className="automation-builder-webhook-note">
+                  Guardá primero la automatización para generar la URL final del webhook.
+                </p>
+              )}
+            </div>
+          )}
+        </section>
+
+        <section className="automation-builder-card">
+          <h2>Servicio de acción</h2>
+          <p className="automation-builder-hint">Elegí qué conector va a ejecutar las acciones.</p>
 
           <ServicePicker service={form.service} onSelect={handleServiceSelect} />
-
-          <ScheduleFrequencyField
-            unit={form.scheduleUnit}
-            value={form.scheduleValue}
-            onFieldChange={handleScheduleFieldChange}
-            onPresetSelect={handleSchedulePresetSelect}
-          />
         </section>
 
         <section className="automation-builder-card">

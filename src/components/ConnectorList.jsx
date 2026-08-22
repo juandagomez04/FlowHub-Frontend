@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
 import ConnectorCard from './ConnectorCard'
-import { sampleConnectors } from '../data/sampleData'
 import { getConnections, disconnectConnector } from '../api/connectors.api'
 import './css/ConnectorList.css'
+
+const CONNECTOR_CATALOG = [
+  { id: 'github', name: 'GitHub', description: 'Repositorios, issues y pull requests' },
+  { id: 'gmail', name: 'Gmail', description: 'Correo entrante y etiquetas' },
+]
 
 export default function ConnectorList() {
   return (
@@ -55,7 +59,7 @@ function ConnectorCards() {
     return null
   }
 
-  return sampleConnectors.map((connector) => (
+  return CONNECTOR_CATALOG.map((connector) => (
     <ConnectorCard
       key={connector.id}
       connector={connector}
